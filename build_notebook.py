@@ -1,7 +1,8 @@
 import json
 
-def md(s): return {"cell_type":"markdown","metadata":{},"source":s.strip().splitlines(True)}
-def code(s): return {"cell_type":"code","execution_count":None,"metadata":{},"outputs":[],"source":s.strip().splitlines(True)}
+import uuid
+def md(s): return {"cell_type":"markdown","id":uuid.uuid4().hex[:8],"metadata":{},"source":s.strip().splitlines(True)}
+def code(s): return {"cell_type":"code","id":uuid.uuid4().hex[:8],"execution_count":None,"metadata":{},"outputs":[],"source":s.strip().splitlines(True)}
 
 cells = []
 
@@ -48,7 +49,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score,
                              confusion_matrix, classification_report, roc_auc_score,
-                             RocCurveDisplay, ConfusionMatrixDisplay)
+                             roc_curve, auc, ConfusionMatrixDisplay)
 from sklearn.pipeline import Pipeline
 
 RANDOM_STATE = 42
@@ -329,10 +330,17 @@ cells.append(md(r"""
 """))
 
 cells.append(code(r"""
+# Multiclass ROC: one-vs-rest curve per class (RocCurveDisplay is binary-only)
+from sklearn.preprocessing import label_binarize
 y_proba = best_pipeline.predict_proba(X_test)
-RocCurveDisplay.from_predictions(y_test, y_proba, labels=[0, 1, 2],
-                                 name="ROC — best model", plot_chance_level=True)
-plt.title(f"ROC curves — {best_name}"); plt.show()
+y_bin = label_binarize(y_test, classes=[0, 1, 2])
+plt.figure(figsize=(7, 6))
+for i, name in enumerate(target_names):
+    fpr, tpr, _ = roc_curve(y_bin[:, i], y_proba[:, i])
+    plt.plot(fpr, tpr, label=f"{name} (AUC={auc(fpr, tpr):.3f})")
+plt.plot([0, 1], [0, 1], "k--", label="chance")
+plt.xlabel("False Positive Rate"); plt.ylabel("True Positive Rate")
+plt.title(f"ROC curves (OvR) — {best_name}"); plt.legend(); plt.show()
 
 # Feature importance / coefficients, if the model exposes them
 model = best_pipeline.named_steps["model"]
@@ -412,7 +420,7 @@ cells.append(md(r"""
 2. Keep everything else the same — models, evaluation, tuning and saving all work
    for any tabular classification dataset (binary or multi-class).
 3. For binary problems, `roc_auc_score(..., multi_class="ovr")` still works, and
-   `RocCurveDisplay` in Section 9 will draw a single curve.
+   the OvR ROC code in Section 9 still works (one curve per class).
 """))
 
 nb = {"cells": cells,
