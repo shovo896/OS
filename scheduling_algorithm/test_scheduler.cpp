@@ -23,10 +23,10 @@ int main() {
     assert((completions(sjf) == std::vector<int>{5, 9, 6}));
     assert(near(sjf.avgWaiting, 8.0 / 3));
 
-    // SRTF: P1(0),P2(1),P3(2),P2(3-4),P1(5-7) -> done 8,5,3 ; waiting 3,1,0
+    // SRTF: P1(0),P2(1),P3(2),P2(3-4),P1(5-8) -> done 9,5,3 ; waiting 4,1,0
     auto srtf = schedule(jobs, Algorithm::SRTF);
-    assert((completions(srtf) == std::vector<int>{8, 5, 3}));
-    assert(near(srtf.avgWaiting, 4.0 / 3));
+    assert((completions(srtf) == std::vector<int>{9, 5, 3}));
+    assert(near(srtf.avgWaiting, 5.0 / 3));
     assert(srtf.processes[2].response == 0);
 
     // Round Robin q=2: P1,P2,P3,P1,P2,P1 -> done 9,8,5 ; waiting 4,4,2

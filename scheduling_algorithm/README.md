@@ -94,12 +94,12 @@ P3: arrival 2, burst 1, priority 2
 |---|---|---|---|
 | FCFS | P1 P2 P3 | 5, 8, 9 | 3.33 |
 | SJF | P1 P3 P2 | 5, 9, 6 | 2.67 |
-| SRTF | P1 P2 P3 P2 P1 | 8, 5, 3 | 1.33 |
+| SRTF | P1 P2 P3 P2 P1 | 9, 5, 3 | 1.67 |
 | Round Robin (q=2) | P1 P2 P3 P1 P2 P1 | 9, 8, 5 | 3.33 |
 | Priority | P1 P2 P3 | 5, 8, 9 | 3.33 |
 
 SRTF trace: t0 P1 (only job) → t1 P2 (3 left < P1's 4) → t2 P3 (1 left)
-→ t3–4 P2 → t5–7 P1. SJF cannot preempt P1, so P3 waits until t5.
+→ t3–4 P2 → t5–8 P1 (4 ticks left). SJF cannot preempt P1, so P3 waits until t5.
 
 ## Step 8 — Implementation map
 
